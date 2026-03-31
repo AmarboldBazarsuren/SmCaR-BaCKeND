@@ -1,26 +1,32 @@
 const express = require('express');
 const asyncHandler = require('../middleware/asyncHandler');
+const { requireAdmin } = require('../middleware/adminAuth');
+const { login, logout, me } = require('../controllers/admin/adminAuthController');
+const { getPriceConfig, updatePriceConfig } = require('../controllers/admin/adminPriceConfigController');
+const { getTaxConfig, updateTaxConfig } = require('../controllers/admin/adminTaxConfigController');
 const {
-  getPriceConfig,
-  updatePriceConfig,
-} = require('../controllers/admin/adminPriceConfigController');
-const {
-  getTaxConfig,
-  updateTaxConfig,
-} = require('../controllers/admin/adminTaxConfigController');
+  getAllBanners, createBanner, updateBanner, deleteBanner,
+} = require('../controllers/admin/adminBannerController');
 
 const router = express.Router();
 
-// GET  /api/admin/price-config  — одоогийн үнийн тохиргоо харах
-router.get('/price-config', asyncHandler(getPriceConfig));
+// ── Auth (нэвтрэхэд token шаардлагагүй) ────────────────────────────────────
+router.post('/login',  asyncHandler(login));
+router.post('/logout', asyncHandler(logout));
+router.get('/me',      requireAdmin, asyncHandler(me));
 
-// PUT  /api/admin/price-config  — үнийн тохиргоо шинэчлэх
-router.put('/price-config', asyncHandler(updatePriceConfig));
+// ── Price config ────────────────────────────────────────────────────────────
+router.get('/price-config', requireAdmin, asyncHandler(getPriceConfig));
+router.put('/price-config', requireAdmin, asyncHandler(updatePriceConfig));
 
-// GET  /api/admin/tax-config  — татварын хүснэгт харах
-router.get('/tax-config', asyncHandler(getTaxConfig));
+// ── Tax config ──────────────────────────────────────────────────────────────
+router.get('/tax-config', requireAdmin, asyncHandler(getTaxConfig));
+router.put('/tax-config', requireAdmin, asyncHandler(updateTaxConfig));
 
-// PUT  /api/admin/tax-config  — татварын хүснэгт шинэчлэх
-router.put('/tax-config', asyncHandler(updateTaxConfig));
+// ── Banners ─────────────────────────────────────────────────────────────────
+router.get('/banners',        requireAdmin, asyncHandler(getAllBanners));
+router.post('/banners',       requireAdmin, asyncHandler(createBanner));
+router.put('/banners/:id',    requireAdmin, asyncHandler(updateBanner));
+router.delete('/banners/:id', requireAdmin, asyncHandler(deleteBanner));
 
 module.exports = router;
