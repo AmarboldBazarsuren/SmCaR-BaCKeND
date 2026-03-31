@@ -1,17 +1,28 @@
 const express = require('express');
-const carRoutes = require('./carRoutes');
-const adminRoutes = require('./adminRoutes');
+const path    = require('path');
+const carRoutes    = require('./carRoutes');
+const adminRoutes  = require('./adminRoutes');
+const uploadRoutes = require('./uploadRoutes');
 const asyncHandler = require('../middleware/asyncHandler');
 const { getActiveBanners } = require('../controllers/admin/adminBannerController');
 const axios = require('axios');
 
 const router = express.Router();
 
+// ── Static: upload хийсэн зургуудыг серв хийх ──────────────────────────────
+router.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+
 // ── Public endpoints ────────────────────────────────────────────────────────
-// GET /api/banners — нүүр хуудасны carousel-д ашиглах
 router.get('/banners', asyncHandler(getActiveBanners));
 
-// ── DEBUG (хөгжүүлэлтийн үед) ───────────────────────────────────────────────
+// ── Upload ──────────────────────────────────────────────────────────────────
+router.use('/upload', uploadRoutes);
+
+// ── Cars & Admin ─────────────────────────────────────────────────────────────
+router.use('/cars',  carRoutes);
+router.use('/admin', adminRoutes);
+
+// ── DEBUG ────────────────────────────────────────────────────────────────────
 router.get('/debug/car', async (req, res) => {
   try {
     const response = await axios.get('https://apicars.info/api/cars?limit=1', {
@@ -26,8 +37,5 @@ router.get('/debug/car', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-router.use('/cars', carRoutes);
-router.use('/admin', adminRoutes);
 
 module.exports = router;
