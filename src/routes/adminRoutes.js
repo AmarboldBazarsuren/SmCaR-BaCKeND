@@ -1,3 +1,4 @@
+// src/routes/adminRoutes.js  ← одоогийн файлыг ЭНЭ-ээр солино
 const express = require('express');
 const asyncHandler = require('../middleware/asyncHandler');
 const { requireAdmin } = require('../middleware/adminAuth');
@@ -7,26 +8,35 @@ const { getTaxConfig, updateTaxConfig } = require('../controllers/admin/adminTax
 const {
   getAllBanners, createBanner, updateBanner, deleteBanner,
 } = require('../controllers/admin/adminBannerController');
+const {
+  getAllListings, createListing, updateListing, deleteListing,
+} = require('../controllers/admin/adminCarListingController');
 
 const router = express.Router();
 
-// ── Auth (нэвтрэхэд token шаардлагагүй) ────────────────────────────────────
+// ── Auth ─────────────────────────────────────────────────────────────────────
 router.post('/login',  asyncHandler(login));
 router.post('/logout', asyncHandler(logout));
 router.get('/me',      requireAdmin, asyncHandler(me));
 
-// ── Price config ────────────────────────────────────────────────────────────
+// ── Price config ──────────────────────────────────────────────────────────────
 router.get('/price-config', requireAdmin, asyncHandler(getPriceConfig));
 router.put('/price-config', requireAdmin, asyncHandler(updatePriceConfig));
 
-// ── Tax config ──────────────────────────────────────────────────────────────
+// ── Tax config ────────────────────────────────────────────────────────────────
 router.get('/tax-config', requireAdmin, asyncHandler(getTaxConfig));
 router.put('/tax-config', requireAdmin, asyncHandler(updateTaxConfig));
 
-// ── Banners ─────────────────────────────────────────────────────────────────
+// ── Banners ───────────────────────────────────────────────────────────────────
 router.get('/banners',        requireAdmin, asyncHandler(getAllBanners));
 router.post('/banners',       requireAdmin, asyncHandler(createBanner));
 router.put('/banners/:id',    requireAdmin, asyncHandler(updateBanner));
 router.delete('/banners/:id', requireAdmin, asyncHandler(deleteBanner));
+
+// ── Car Listings (admin-аас нэмсэн зар) ──────────────────────────────────────
+router.get('/listings',        requireAdmin, asyncHandler(getAllListings));
+router.post('/listings',       requireAdmin, asyncHandler(createListing));
+router.put('/listings/:id',    requireAdmin, asyncHandler(updateListing));
+router.delete('/listings/:id', requireAdmin, asyncHandler(deleteListing));
 
 module.exports = router;
